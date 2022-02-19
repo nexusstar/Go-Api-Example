@@ -3,7 +3,7 @@ package main
 import (
   "net/http"
   "github.com/gin-gonic/gin"
-  // "errors"
+  "errors"
   )
 
 type book struct {
@@ -30,17 +30,25 @@ func getBooks(c *gin.Context) {
   c.IndentedJSON(http.StatusOK, books)
 }
 
-func getBook(c *gin.Context) {
-  id := c.Param("id")
+func getBookById(id string) (book, error) {
   for _, book := range books {
     if book.ID == id {
-      c.JSON(http.StatusOK, book)
-      return
+      return book, nil
     }
   }
-  c.JSON(http.StatusNotFound, gin.H{
-    "message": "Book not found",
-  })
+  return book{}, errors.New("Book not found")
+}
+
+func getBook(c *gin.Context) {
+  id := c.Param("id")
+  book, err := getBookById(id)
+  if err != nil {
+    c.JSON(http.StatusNotFound, gin.H{
+      "message": "Book not found",
+    })
+    return
+  }
+  c.IndentedJSON(http.StatusOK, book)
 }
 
 func addBook(c *gin.Context) {
