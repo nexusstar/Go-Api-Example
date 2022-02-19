@@ -43,12 +43,30 @@ func getBook(c *gin.Context) {
   })
 }
 
+func addBook(c *gin.Context) {
+  var newBook book
+  
+  if err := c.BindJSON(&newBook); err != nil {
+    c.JSON(http.StatusBadRequest, gin.H{
+      "message": "Invalid request",
+    })
+    return
+  }
+
+  books = append(books, newBook)
+  
+  c.JSON(http.StatusCreated, gin.H{
+    "message": "Book added successfully",
+    "book": newBook,
+  })
+}
+
 func main () {
   router := gin.Default()
   router.GET("/", getApi)
   router.GET("/books", getBooks)
   router.GET("/books/:id", getBook)
-  // router.POST("/books", addBook)
+  router.POST("/books", addBook)
   // router.PUT("/books/:id", updateBook)
   // router.DELETE("/books/:id", deleteBook)
   router.Run(":8080")
