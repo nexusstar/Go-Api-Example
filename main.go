@@ -30,11 +30,24 @@ func getBooks(c *gin.Context) {
   c.IndentedJSON(http.StatusOK, books)
 }
 
+func getBook(c *gin.Context) {
+  id := c.Param("id")
+  for _, book := range books {
+    if book.ID == id {
+      c.JSON(http.StatusOK, book)
+      return
+    }
+  }
+  c.JSON(http.StatusNotFound, gin.H{
+    "message": "Book not found",
+  })
+}
+
 func main () {
   router := gin.Default()
   router.GET("/", getApi)
   router.GET("/books", getBooks)
-  // router.GET("/books/:id", getBook)
+  router.GET("/books/:id", getBook)
   // router.POST("/books", addBook)
   // router.PUT("/books/:id", updateBook)
   // router.DELETE("/books/:id", deleteBook)
